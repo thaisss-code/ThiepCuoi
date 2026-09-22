@@ -35,6 +35,12 @@ class WeddingAudioPlayer {
         url: 'https://cdn.pixabay.com/download/audio/2022/11/06/audio_248467fe08.mp3?filename=wedding-piano-126296.mp3'
       },
       {
+        id: 'local-wedding-song',
+        type: 'sample',
+        name: 'Nhạc Tự Đặt Trong Thư Mục (assets/audio/wedding-song.mp3)',
+        url: 'assets/audio/wedding-song.mp3'
+      },
+      {
         id: 'romantic-memories',
         type: 'sample',
         name: 'Romantic Memories - Wedding Waltz (Du dương, ngọt ngào)',

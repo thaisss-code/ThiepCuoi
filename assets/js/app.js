@@ -807,9 +807,31 @@ window.handleAudioUpload = function(event) {
       weddingDB.data.music = customTrack;
       weddingDB.saveData();
       window.weddingAudio.play(customTrack);
-      showToast(`Đã tải lên bài hát: ${customTrack.name}`);
+      showToast(`Đã tải lên: ${customTrack.name}. Lưu ý: Để lưu vĩnh viễn trên GitHub, hãy copy file vào assets/audio/wedding-song.mp3 nhé!`);
     });
   }
+};
+
+// Dán đường link nhạc online
+window.handleSetOnlineMusicUrl = function() {
+  const input = document.getElementById('input-online-music-url');
+  if (!input) return;
+  const url = input.value.trim();
+  if (!url) {
+    showToast('Vui lòng dán đường link MP3 online!');
+    return;
+  }
+  const track = {
+    type: 'sample',
+    name: 'Nhạc Cưới Online (Tự Chọn)',
+    url: url
+  };
+  weddingDB.data.music = track;
+  weddingDB.saveData();
+  if (window.weddingAudio) {
+    window.weddingAudio.play(track);
+  }
+  showToast('Đã lưu đường link bài hát online thành công! 🎶');
 };
 
 /* =========================================================
@@ -878,8 +900,8 @@ window.verifyAdminPin = function() {
   const err = document.getElementById('pin-error-msg');
   const pin = input ? input.value.trim() : '';
 
-  // Mật khẩu PIN quản trị: 130305
-  if (pin === '130305' || pin.toLowerCase() === 'admin') {
+  // Mật khẩu PIN quản trị: chỉ chấp nhận duy nhất 130305
+  if (pin === '130305') {
     localStorage.setItem('wedding_is_admin', 'true');
     window.closePinModal();
     window.applyAdminMode();
@@ -1219,5 +1241,12 @@ window.exportGuestsToTxt = function() {
   document.body.removeChild(a);
   showToast('Đã tải về file danh sách link khách mời (.txt)!');
 };
+
+window.exportDataJsFile = function() {
+  if (window.weddingDB && typeof window.weddingDB.exportDataJsFile === 'function') {
+    window.weddingDB.exportDataJsFile();
+  }
+};
+
 
 
