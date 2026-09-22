@@ -878,8 +878,8 @@ window.verifyAdminPin = function() {
   const err = document.getElementById('pin-error-msg');
   const pin = input ? input.value.trim() : '';
 
-  // Mật khẩu PIN mặc định 1234
-  if (pin === '1234' || pin.toLowerCase() === 'admin') {
+  // Mật khẩu PIN quản trị: 130305
+  if (pin === '130305' || pin.toLowerCase() === 'admin') {
     localStorage.setItem('wedding_is_admin', 'true');
     window.closePinModal();
     window.applyAdminMode();

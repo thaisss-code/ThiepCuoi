@@ -751,11 +751,11 @@
           Khu vực dành riêng cho <strong>Cô Dâu & Chú Rể</strong> để đổi ảnh bìa, avatar, thêm/xóa ảnh album cưới và quản lý danh sách khách mời.
         </p>
         <div class="form-group">
-          <label style="font-size: 0.84rem; font-weight: 600; color: #1f2937;">Nhập mã PIN quản trị (Mặc định: 1234):</label>
-          <input type="password" id="admin-pin-input" class="form-input" placeholder="••••" style="text-align: center; letter-spacing: 6px; font-size: 1.3rem; margin-top: 6px;" maxlength="8" onkeydown="if(event.key==='Enter') verifyAdminPin()">
+          <label style="font-size: 0.84rem; font-weight: 600; color: #1f2937;">Nhập mã PIN quản trị (6 số):</label>
+          <input type="password" id="admin-pin-input" class="form-input" placeholder="••••••" style="text-align: center; letter-spacing: 6px; font-size: 1.3rem; margin-top: 6px;" maxlength="10" onkeydown="if(event.key==='Enter') verifyAdminPin()">
         </div>
         <div id="pin-error-msg" style="color: #dc2626; font-size: 0.82rem; display: none; margin-top: 6px; font-weight: 500;">
-          <i class="fa-solid fa-circle-exclamation mr-1"></i> Mã PIN không đúng! (Mặc định là 1234)
+          <i class="fa-solid fa-circle-exclamation mr-1"></i> Mã PIN không chính xác! Vui lòng thử lại.
         </div>
       </div>
       <div class="pin-footer">
