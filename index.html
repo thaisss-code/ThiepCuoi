@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="rose">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Thiệp Cưới Online Thông Minh - Lễ Thành Hôn</title>
+  <meta name="description" content="Trân trọng kính mời quý khách đến tham dự lễ thành hôn của chúng tôi. Thiệp cưới online hiện đại chuẩn phong cách 5.0.">
+
+  <!-- Open Graph / Meta chia sẻ Facebook, Zalo -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Thiệp Cưới Online - Trân Trọng Kính Mời">
+  <meta property="og:description" content="Chúng mình rất vui và hạnh phúc khi có sự hiện diện của bạn trong ngày trọng đại!">
+  <meta property="og:image" content="assets/images/wedding-cover.jpg">
+
+  <!-- Font Awesome Icons 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Hiệu ứng cánh hoa bay lãng mạn -->
+  <canvas id="petals-canvas"></canvas>
+
+  <!-- Thanh trạng thái Admin -->
+  <div id="admin-status-bar" class="admin-status-bar admin-only">
+    <div class="admin-status-content">
+      <span><i class="fa-solid fa-shield-halved"></i> <strong>Chế Độ Quản Trị</strong> (Chỉ bạn mới thấy các nút chỉnh sửa & đổi ảnh)</span>
+      <button class="btn-exit-admin" onclick="exitAdminMode()"><i class="fa-solid fa-eye"></i> Xem Thiệp Như Khách Mời</button>
+    </div>
+  </div>
+
+  <!-- Thanh công cụ điều khiển trên đỉnh (Chỉ Admin mới thấy) -->
+  <header class="top-control-bar admin-only">
+    <button class="guest-quick-btn" id="guest-quick-btn" onclick="openQuickGuestModal()">
+      <i class="fa-solid fa-users-gear"></i> Tạo Link 10+ Khách Mời
+    </button>
+    <button class="studio-toggle-btn" id="studio-toggle-btn">
+      <i class="fa-solid fa-wand-magic-sparkles"></i> Thiết Kế Thiệp (Studio)
+    </button>
+    <button class="device-toggle-btn" id="device-toggle-btn">
+      <i class="fa-solid fa-desktop"></i> Toàn Màn Hình
+    </button>
+  </header>
+
+  <!-- Đĩa than phát nhạc xoay góc dưới -->
+  <div class="audio-fab" id="audio-fab" title="Bật/Tắt Nhạc Cưới">
+    <div class="vinyl-disk" id="vinyl-disk">
+      <div class="vinyl-center">
+        <i class="fa-solid fa-music"></i>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- =======================================================
+       PHONG BÌ MỞ THIỆP CƯỚI (ENVELOPE OVERLAY)
+       ======================================================= -->
+  <div class="envelope-overlay" id="envelope-overlay">
+    <div class="envelope-card">
+      <div class="envelope-border-corner top-left"></div>
+      <div class="envelope-border-corner top-right"></div>
+      <div class="envelope-border-corner bottom-left"></div>
+      <div class="envelope-border-corner bottom-right"></div>
+
+      <div class="envelope-header-icon">
+        <i class="fa-solid fa-heart-pulse"></i>
+      </div>
+      <div class="envelope-sub-label">Happy Wedding • Save The Date</div>
+      <h1 class="envelope-couple-name" id="envelope-couple-names">Văn Đức & Thùy Linh</h1>
+
+      <div class="envelope-guest-box">
+        <div class="label">Trân Trọng Kính Mời</div>
+        <div class="guest-name" id="envelope-guest-name">Quý Khách & Gia Đình</div>
+      </div>
+
+      <div class="wax-seal-wrapper" id="wax-seal-btn" title="Chạm vào để mở thiệp">
+        <div class="wax-seal">
+          <i class="fa-solid fa-envelope-open-text"></i>
+          <span>Mở Thiệp</span>
+        </div>
+      </div>
+
+      <div class="open-hint">
+        <i class="fa-solid fa-hand-pointer"></i> Chạm vào con dấu sáp để mở thiệp & nghe nhạc
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================
+       NỘI DUNG CHÍNH THIỆP CƯỚI (GUEST INVITATION VIEW)
+       ======================================================= -->
+  <main class="app-container">
+    <div class="wedding-viewport" id="wedding-viewport">
+      
+      <!-- HERO BANNER -->
+      <section class="invitation-hero">
+        <button class="cover-photo-edit-btn admin-only" onclick="triggerPhotoUpload('cover')" title="Đổi ảnh bìa thiệp cưới">
+          <i class="fa-solid fa-camera"></i> Đổi ảnh bìa
+        </button>
+        <div class="hero-bg-media" id="hero-bg-image"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <span class="hero-badge reveal-on-scroll reveal-fade-down">Save The Date • Lễ Thành Hôn</span>
+          <h2 class="hero-title reveal-on-scroll reveal-zoom-in" id="hero-couple-names">Văn Đức & Thùy Linh</h2>
+
+          <div class="hero-guest-greet reveal-on-scroll reveal-fade-up delay-200">
+            <div class="hint">Trân trọng kính mời</div>
+            <div class="name" id="hero-guest-name">Quý Khách & Gia Đình</div>
+            <div style="font-size: 0.8rem; margin-top: 2px;">Tới dự bữa cơm thân mật chung vui cùng gia đình chúng tôi!</div>
+          </div>
+
+          <div class="hero-date-box reveal-on-scroll reveal-fade-up delay-300">
+            <div id="hero-wedding-date" style="font-weight: 600; font-size: 1.05rem;">Thứ Sáu, 20 Tháng 11 Năm 2026</div>
+            <div class="lunar" id="hero-wedding-lunar">Tức ngày 12 tháng 10 năm Bính Ngọ (Âm Lịch)</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LỜI NGỎ & ĐẾM NGƯỢC -->
+      <section class="wedding-section" style="padding-top: 30px; text-align: center;">
+        <div class="reveal-on-scroll reveal-fade-up" style="font-family: var(--font-classic); font-size: 1.15rem; font-style: italic; color: var(--text-body); max-width: 90%; margin: 0 auto 24px;">
+          "Tình yêu không phải là tìm kiếm một người hoàn hảo, mà là học cách yêu thương một người không hoàn hảo một cách trọn vẹn nhất."
+        </div>
+
+        <div class="section-header reveal-on-scroll reveal-fade-up">
+          <div class="section-subtitle">Khoảnh Khắc Hạnh Phúc</div>
+          <h3 class="section-title">Đếm Ngược Ngày Cưới</h3>
+          <div class="section-divider"><i class="fa-solid fa-heart"></i></div>
+        </div>
+
+        <div class="countdown-container reveal-on-scroll reveal-zoom-in delay-150">
+          <div class="count-unit">
+            <div class="count-number" id="count-days">00</div>
+            <div class="count-label">Ngày</div>
+          </div>
+          <div class="count-unit">
+            <div class="count-number" id="count-hours">00</div>
+            <div class="count-label">Giờ</div>
+          </div>
+          <div class="count-unit">
+            <div class="count-number" id="count-mins">00</div>
+            <div class="count-label">Phút</div>
+          </div>
+          <div class="count-unit">
+            <div class="count-number" id="count-secs">00</div>
+            <div class="count-label">Giây</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CÔ DÂU & CHÚ RỂ -->
+      <section class="wedding-section" style="background: var(--bg-secondary);">
+        <div class="section-header reveal-on-scroll reveal-fade-up">
+          <div class="section-subtitle">Gặp Gỡ Đôi Uyên Ương</div>
+          <h3 class="section-title">Cô Dâu & Chú Rể</h3>
+          <div class="section-divider"><i class="fa-solid fa-ring"></i></div>
+        </div>
+
+        <div class="couple-cards-grid">
+          <!-- Chú Rể - Trượt từ trái sang -->
+          <div class="person-card reveal-on-scroll reveal-fade-left">
+            <div class="person-avatar-wrap">
+              <img src="assets/images/groom-bride.jpg" alt="Chú Rể" class="person-avatar" id="groom-avatar">
+              <button class="photo-edit-badge admin-only" onclick="triggerPhotoUpload('groom')" title="Đổi ảnh đại diện Chú Rể">
+                <i class="fa-solid fa-camera"></i>
+              </button>
+            </div>
+            <div class="person-role">Chú Rể</div>
+            <h4 class="person-name" id="groom-name">Nguyễn Văn Đức</h4>
+            <div class="person-parents" id="groom-parents">Con ông: Nguyễn Văn Hùng & Bà: Trần Thị Lan</div>
+            <p class="person-bio" id="groom-bio">Chàng trai chân thành, đam mê công nghệ và luôn dành trọn tình cảm cho người mình thương.</p>
+          </div>
+
+          <!-- Cô Dâu - Trượt từ phải sang -->
+          <div class="person-card reveal-on-scroll reveal-fade-right">
+            <div class="person-avatar-wrap">
+              <img src="assets/images/groom-bride.jpg" alt="Cô Dâu" class="person-avatar" id="bride-avatar">
+              <button class="photo-edit-badge admin-only" onclick="triggerPhotoUpload('bride')" title="Đổi ảnh đại diện Cô Dâu">
+                <i class="fa-solid fa-camera"></i>
+              </button>
+            </div>
+            <div class="person-role">Cô Dâu</div>
+            <h4 class="person-name" id="bride-name">Trần Thị Thùy Linh</h4>
+            <div class="person-parents" id="bride-parents">Con ông: Trần Văn Long & Bà: Lê Thị Thu</div>
+            <p class="person-bio" id="bride-bio">Cô gái dịu dàng, nụ cười tỏa nắng và là hậu phương ngọt ngào nhất của cuộc đời anh.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHẦN TRÂN TRỌNG KÍNH MỜI (FORMAL INVITATION & NỔI BẬT NGÀY CƯỚI) -->
+      <section class="wedding-section">
+        <div class="section-header reveal-on-scroll reveal-fade-up">
+          <div class="section-subtitle">Thư Mời Hôn Lễ</div>
+          <h3 class="section-title">Trân Trọng Kính Mời</h3>
+          <div class="section-divider"><i class="fa-solid fa-envelope-open-text"></i></div>
+        </div>
+
+        <div class="formal-invitation-card reveal-on-scroll reveal-fade-up">
+          <div class="formal-card-corner top-left"></div>
+          <div class="formal-card-corner top-right"></div>
+          <div class="formal-card-corner bottom-left"></div>
+          <div class="formal-card-corner bottom-right"></div>
+
+          <span class="formal-invitation-badge">Thiệp Mời Thành Hôn</span>
+          <div class="formal-guest-title">Trân Trọng Kính Mời:</div>
+          <h3 class="formal-guest-name" id="formal-invitation-guest">Quý Khách & Gia Đình</h3>
+          
+          <p class="formal-invitation-text">
+            Tới dự bữa cơm thân mật chung vui cùng gia đình chúng tôi tại lễ thành hôn của hai con chúng tôi:
+          </p>
+
+          <!-- KHUNG NGÀY CƯỚI ĐƯỢC LÀM NỔI BẬT ĐẶC BIỆT -->
+          <div class="highlight-date-calendar reveal-on-scroll reveal-zoom-in delay-200">
+            <div class="highlight-date-day-name" id="formal-day-name">THỨ SÁU</div>
+            <div class="highlight-date-number" id="formal-date-number">20</div>
+            <div class="highlight-date-month-year" id="formal-month-year">THÁNG 11 • NĂM 2026</div>
+            <div class="highlight-date-lunar" id="formal-lunar-date">Tức Ngày 12 Tháng 10 Năm Bính Ngọ (Âm Lịch)</div>
+          </div>
+
+          <!-- CHI TIẾT GIỜ GIẤC & ĐỊA ĐIỂM TỔ CHỨC -->
+          <div class="formal-event-location-box reveal-on-scroll reveal-fade-up delay-300">
+            <div class="formal-event-row">
+              <div class="formal-event-icon"><i class="fa-regular fa-clock"></i></div>
+              <div>
+                <div style="font-weight: 700; color: var(--text-dark); font-size: 0.95rem;">Thời gian đón khách & Tiệc cưới:</div>
+                <div id="formal-event-time" style="color: var(--primary); font-weight: 700; font-size: 1.05rem;">11:30 - Ngày 20/11/2026</div>
+              </div>
+            </div>
+
+            <div class="formal-event-row" style="margin-top: 14px;">
+              <div class="formal-event-icon"><i class="fa-solid fa-location-dot"></i></div>
+              <div>
+                <div style="font-weight: 700; color: var(--text-dark); font-size: 0.95rem;" id="formal-event-location">Trung Tâm Tiệc Cưới & Hội Nghị Trống Đồng Palace</div>
+                <div id="formal-event-address" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 3px;">Sảnh Hoàng Gia - Tầng 2, Số 489 Hoàng Quốc Việt, Cầu Giấy, Hà Nội</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NÚT BẤM CHỈ ĐƯỜNG & LƯU LỊCH -->
+          <div class="event-actions" style="margin-top: 16px;">
+            <a href="https://maps.google.com/?q=Trong+Dong+Palace+Hoang+Quoc+Viet" target="_blank" rel="noopener" class="event-btn btn-maps" id="formal-map-btn" style="padding: 11px 18px; font-size: 0.9rem;">
+              <i class="fa-solid fa-map-location-dot"></i> Chỉ đường Google Maps
+            </a>
+            <a href="#" target="_blank" rel="noopener" class="event-btn btn-calendar" id="formal-cal-btn" style="padding: 11px 18px; font-size: 0.9rem;">
+              <i class="fa-regular fa-calendar-plus"></i> Lưu vào Lịch Hẹn
+            </a>
+          </div>
+
+          <div style="margin-top: 24px; font-size: 0.88rem; color: var(--text-muted); font-style: italic;">
+            "Sự hiện diện của Quý khách là niềm vinh hạnh lớn nhất cho gia đình chúng tôi!"
+          </div>
+        </div>
+      </section>
+
+      <!-- ALBUM ẢNH CƯỚI -->
+      <section class="wedding-section" style="background: var(--bg-secondary);">
+        <div class="section-header reveal-on-scroll reveal-fade-up">
+          <div class="section-subtitle">Kỷ Niệm Tình Yêu</div>
+          <h3 class="section-title">Album Ảnh Cưới</h3>
+          <div class="section-divider"><i class="fa-regular fa-images"></i></div>
+        </div>
+
+        <div class="gallery-action-header reveal-on-scroll reveal-fade-up admin-only">
+          <button class="btn-add-gallery-photo" onclick="triggerPhotoUpload('gallery')">
+            <i class="fa-solid fa-plus-circle"></i> Thêm Ảnh Vào Album Cưới
+          </button>
+        </div>
+
+        <div class="gallery-grid" id="gallery-container">
+          <!-- Render ảnh từ app.js -->
+        </div>
+      </section>
+
+
+
+      <!-- TIỆN ÍCH TẠO THIỆP GỬI KHÁCH KHÁC (Chỉ Admin mới thấy) -->
+      <section class="wedding-section reveal-on-scroll reveal-fade-up admin-only" style="padding: 20px 20px 30px; text-align: center;">
+        <div style="background: linear-gradient(135deg, #eff6ff, #fdf2f8); border-radius: 16px; padding: 22px 18px; border: 1px dashed #93c5fd; box-shadow: var(--shadow-sm);">
+          <div style="font-size: 1.6rem; color: #2563eb; margin-bottom: 6px;"><i class="fa-solid fa-users-gear"></i></div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #1e3a8a; margin-bottom: 4px;">Bạn muốn tạo thiệp gửi cho nhiều người khác?</h4>
+          <p style="font-size: 0.82rem; color: #4b5563; margin-bottom: 14px;">
+            Nhập danh sách 10 - 50 khách, hệ thống sẽ tự động tạo link riêng có tên từng người để bạn gửi Zalo chỉ với 1 chạm!
+          </p>
+          <button class="btn-guest-action btn-action-zalo" onclick="openQuickGuestModal()" style="padding: 10px 22px; font-size: 0.9rem; margin: 0 auto; display: inline-flex;">
+            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Bấm Vào Đây Để Tạo Link 10+ Khách Mời
+          </button>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="wedding-footer">
+        <div class="footer-love-text">Thank You!</div>
+        <p>Sự hiện diện của quý vị là niềm vinh hạnh lớn nhất cho gia đình chúng tôi!</p>
+        <p style="margin-top: 8px; font-size: 0.74rem; opacity: 0.7;">Thiệp Cưới Online • Nền Tảng Công Nghệ 5.0</p>
+        
+        <!-- Nút kích hoạt chế độ Quản trị cho Cô Dâu / Chú Rể -->
+        <div class="footer-admin-link">
+          <button id="btn-admin-gate" onclick="handleAdminGateClick()" class="btn-footer-admin">
+            <i class="fa-solid fa-lock"></i> <span id="admin-gate-text">Dành cho Cô Dâu & Chú Rể</span>
+          </button>
+        </div>
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- =======================================================
+       LIGHTBOX PHÓNG TO ẢNH FULLSCREEN
+       ======================================================= -->
+  <div class="lightbox-modal" id="lightbox-modal">
+    <button class="lightbox-close-btn" id="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <button class="lightbox-nav-btn prev" onclick="navLightbox(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="lightbox-img-wrap">
+      <img src="" alt="Phóng to ảnh cưới" id="lightbox-img">
+    </div>
+    <button class="lightbox-nav-btn next" onclick="navLightbox(1)"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+
+  <!-- =======================================================
+       STUDIO CREATOR - TRÌNH THIẾT KẾ THIỆP CƯỚI TOÀN NĂNG
+       ======================================================= -->
+  <div class="studio-modal-overlay" id="studio-modal">
+    <div class="studio-dialog">
+      
+      <!-- Studio Header -->
+      <div class="studio-header">
+        <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Wedding Studio - Trình Quản Trị & Tạo Thiệp</h3>
+        <button class="studio-close-btn" id="studio-close-btn">&times;</button>
+      </div>
+
+      <!-- Studio Navigation Tabs -->
+      <div class="studio-tabs-bar">
+        <button class="studio-tab-item active" data-pane="info" onclick="switchStudioTab('info')">
+          <i class="fa-solid fa-heart"></i> Thông Tin Cơ Bản
+        </button>
+        <button class="studio-tab-item" data-pane="time-events" onclick="switchStudioTab('time-events')">
+          <i class="fa-regular fa-calendar-days"></i> Thời Gian & Tiệc Cưới
+        </button>
+        <button class="studio-tab-item" data-pane="guests" onclick="switchStudioTab('guests')">
+          <i class="fa-solid fa-users"></i> Khách Mời Cá Nhân Hóa
+        </button>
+        <button class="studio-tab-item" data-pane="gallery" onclick="switchStudioTab('gallery')">
+          <i class="fa-regular fa-images"></i> Album Ảnh
+        </button>
+        <button class="studio-tab-item" data-pane="music-theme" onclick="switchStudioTab('music-theme')">
+          <i class="fa-solid fa-music"></i> Nhạc & Giao Diện
+        </button>
+        <button class="studio-tab-item" data-pane="banking" onclick="switchStudioTab('banking')">
+          <i class="fa-solid fa-qrcode"></i> Mừng Cưới VietQR
+        </button>
+      </div>
+
+      <!-- Studio Body Content -->
+      <div class="studio-content-body">
+        
+        <!-- PANE 1: THÔNG TIN CƠ BẢN -->
+        <div class="studio-pane active" id="pane-info">
+          <div class="studio-grid-2">
+            <!-- Chú Rể -->
+            <div>
+              <h4 style="color: var(--primary); margin-bottom: 12px;"><i class="fa-solid fa-user-tie mr-1"></i> Thông Tin Chú Rể</h4>
+              
+              <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px; background: #fff5f7; padding: 10px; border-radius: 8px;">
+                <img id="preview-groom-avatar" src="assets/images/groom-bride.jpg" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold);">
+                <div>
+                  <div style="font-size: 0.82rem; font-weight: 600; color: #333;">Ảnh đại diện Chú Rể</div>
+                  <button type="button" class="mini-btn btn-secondary" onclick="triggerPhotoUpload('groom')" style="margin-top: 4px;">
+                    <i class="fa-solid fa-camera mr-1"></i> Chọn Ảnh Từ Máy
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Họ và tên đầy đủ:</label>
+                <input type="text" id="input-groom" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tên gọi thân mật / Ngắn gọn:</label>
+                <input type="text" id="input-groom-short" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tên Bố chú rể:</label>
+                <input type="text" id="input-groom-father" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tên Mẹ chú rể:</label>
+                <input type="text" id="input-groom-mother" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Đôi nét về chú rể:</label>
+                <textarea id="input-groom-story" class="form-textarea" rows="2"></textarea>
+              </div>
+            </div>
+
+            <!-- Cô Dâu -->
+            <div>
+              <h4 style="color: var(--primary); margin-bottom: 12px;"><i class="fa-solid fa-person-dress mr-1"></i> Thông Tin Cô Dâu</h4>
+              
+              <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px; background: #fff5f7; padding: 10px; border-radius: 8px;">
+                <img id="preview-bride-avatar" src="assets/images/groom-bride.jpg" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold);">
+                <div>
+                  <div style="font-size: 0.82rem; font-weight: 600; color: #333;">Ảnh đại diện Cô Dâu</div>
+                  <button type="button" class="mini-btn btn-secondary" onclick="triggerPhotoUpload('bride')" style="margin-top: 4px;">
+                    <i class="fa-solid fa-camera mr-1"></i> Chọn Ảnh Từ Máy
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Họ và tên đầy đủ:</label>
+                <input type="text" id="input-bride" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tên gọi thân mật / Ngắn gọn:</label>
+                <input type="text" id="input-bride-short" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tên Bố cô dâu:</label>
+                <input type="text" id="input-bride-father" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tên Mẹ cô dâu:</label>
+                <input type="text" id="input-bride-mother" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Đôi nét về cô dâu:</label>
+                <textarea id="input-bride-story" class="form-textarea" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 2: THỜI GIAN & ĐỊA ĐIỂM -->
+        <div class="studio-pane" id="pane-time-events">
+          <div class="form-group">
+            <label class="form-label">Thời gian hôn lễ chính (Dùng cho đồng hồ đếm ngược):</label>
+            <input type="datetime-local" id="input-wedding-date" class="form-input">
+          </div>
+          <div class="studio-grid-2">
+            <div class="form-group">
+              <label class="form-label">Chuỗi ngày hiển thị (Dương lịch):</label>
+              <input type="text" id="input-wedding-date-display" class="form-input" placeholder="Ví dụ: Thứ Sáu, 20 Tháng 11 Năm 2026">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ngày Âm lịch:</label>
+              <input type="text" id="input-wedding-lunar" class="form-input" placeholder="Ví dụ: Tức ngày 12 tháng 10 năm Bính Ngọ">
+            </div>
+          </div>
+
+          <h4 style="color: var(--primary); margin: 20px 0 10px;"><i class="fa-solid fa-champagne-glasses mr-1"></i> Thông Tin Tiệc Cưới Chính</h4>
+          <div class="studio-grid-2">
+            <div class="form-group">
+              <label class="form-label">Giờ tổ chức:</label>
+              <input type="text" id="input-tiec-time" class="form-input" placeholder="11:30">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ngày tổ chức:</label>
+              <input type="text" id="input-tiec-date" class="form-input" placeholder="20/11/2026">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tên Trung tâm / Nhà hàng tiệc cưới:</label>
+            <input type="text" id="input-tiec-location" class="form-input" placeholder="Trung Tâm Tiệc Cưới Trống Đồng Palace">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Địa chỉ chi tiết:</label>
+            <input type="text" id="input-tiec-address" class="form-input" placeholder="Sảnh Hoàng Gia - Số 489 Hoàng Quốc Việt, Cầu Giấy, Hà Nội">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Đường dẫn Google Maps (Chỉ đường):</label>
+            <input type="text" id="input-tiec-map" class="form-input" placeholder="https://maps.google.com/?q=...">
+          </div>
+        </div>
+
+        <!-- PANE 3: QUẢN LÝ KHÁCH MỜI CÁ NHÂN HÓA -->
+        <div class="studio-pane" id="pane-guests">
+          <div class="guest-input-box">
+            <h5 style="margin-bottom: 8px; color: var(--primary);">Thêm Từng Khách Mời:</h5>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="input-add-guest-name" class="form-input" placeholder="Nhập tên khách (VD: Anh Tuấn, Gia đình Bác Hùng...)">
+              <select id="select-guest-side" class="form-select" style="width: 140px;">
+                <option value="Nhà Trai">Nhà Trai</option>
+                <option value="Nhà Gái">Nhà Gái</option>
+              </select>
+              <button class="btn-primary" onclick="addSingleGuest()" style="white-space: nowrap;">
+                <i class="fa-solid fa-plus"></i> Thêm
+              </button>
+            </div>
+          </div>
+
+          <div class="guest-input-box">
+            <h5 style="margin-bottom: 8px; color: var(--primary);">Thêm Nhanh Hàng Loạt Khách Mời (Mỗi dòng 1 tên):</h5>
+            <textarea id="textarea-batch-guests" class="form-textarea" rows="3" placeholder="Anh Hoàng Long&#10;Chị Thu Thảo & Bạn Trai&#10;Gia đình Chú Bảy&#10;Nhóm Bạn Cấp 3"></textarea>
+            <button class="btn-secondary" onclick="addBatchGuests()" style="margin-top: 8px;">
+              <i class="fa-solid fa-list-check"></i> Tạo Link Hàng Loạt
+            </button>
+          </div>
+
+          <h5 style="margin-bottom: 10px; color: var(--text-dark);">Danh Sách Khách & Link Riêng Từng Người:</h5>
+          <div class="guest-table-wrapper">
+            <table class="guest-admin-table">
+              <thead>
+                <tr>
+                  <th>Tên Khách Mời</th>
+                  <th>Phía Khách</th>
+                  <th>Hành Động (Copy / Gửi Zalo)</th>
+                </tr>
+              </thead>
+              <tbody id="studio-guest-table-body">
+                <!-- Render từ app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PANE 4: ALBUM ẢNH -->
+        <div class="studio-pane" id="pane-gallery">
+          <!-- Ảnh bìa chính -->
+          <div class="preset-samples-box" style="margin-bottom: 18px;">
+            <label class="form-label" style="font-weight: 700; color: var(--primary);">
+              <i class="fa-solid fa-image mr-1"></i> Ảnh Bìa Thiệp Cưới Chính (Hero Cover):
+            </label>
+            <div style="display: flex; align-items: center; gap: 16px; margin-top: 8px; flex-wrap: wrap;">
+              <img id="preview-cover-image" src="assets/images/wedding-cover.jpg" style="width: 120px; height: 80px; border-radius: 8px; object-fit: cover; border: 1px solid #ddd; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+              <button type="button" class="btn-secondary" onclick="triggerPhotoUpload('cover')">
+                <i class="fa-solid fa-camera mr-1"></i> Tải Ảnh Bìa Mới Từ Máy
+              </button>
+            </div>
+          </div>
+
+          <!-- Album ảnh cưới -->
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+              <label class="form-label" style="font-weight: 700; color: var(--text-dark); margin-bottom: 0;">
+                <i class="fa-regular fa-images text-primary mr-1"></i> Bộ Sưu Tập Album Ảnh Cưới:
+              </label>
+              <button type="button" class="btn-primary" onclick="triggerPhotoUpload('gallery')" style="padding: 7px 16px; font-size: 0.82rem;">
+                <i class="fa-solid fa-plus-circle mr-1"></i> Tải Thêm Ảnh Từ Máy
+              </button>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
+              Bấm nút 🗑️ trên góc mỗi ảnh để xóa ảnh không dùng, hoặc bấm nút trên để tải ảnh của bạn lên.
+            </p>
+            <div class="gallery-grid" id="studio-gallery-container" style="grid-template-columns: repeat(4, 1fr); gap: 10px;">
+              <!-- Render tự động ảnh kèm nút xóa từ app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 5: NHẠC NỀN & GIAO DIỆN -->
+        <div class="studio-pane" id="pane-music-theme">
+          <h4 style="color: var(--primary); margin-bottom: 12px;"><i class="fa-solid fa-palette mr-1"></i> Phong Cách & Màu Sắc Giao Diện</h4>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;">
+            <label style="display: flex; align-items: center; gap: 8px; background: #fff0f3; padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid #ffd1dc;">
+              <input type="radio" name="studio-theme" value="rose" checked>
+              <span>🌸 <strong>Hồng Pastel Lãng Mạn</strong> (Mặc định)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; background: #fbf0f2; padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid #f0ccd2;">
+              <input type="radio" name="studio-theme" value="ruby">
+              <span>🍷 <strong>Đỏ Rượu & Vàng Hoàng Gia</strong></span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; background: #f4f5f6; padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid #d5dbdf;">
+              <input type="radio" name="studio-theme" value="pearl">
+              <span>🕊️ <strong>Trắng Ngọc & Minimalist</strong></span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; background: #f0f7f2; padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid #cfe2d4;">
+              <input type="radio" name="studio-theme" value="mint">
+              <span>🌿 <strong>Xanh Mint & Sage Tươi Mát</strong></span>
+            </label>
+          </div>
+
+          <h4 style="color: var(--primary); margin-bottom: 12px;"><i class="fa-solid fa-music mr-1"></i> Chọn Bài Hát Nền</h4>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+            <button class="btn-secondary" style="text-align: left;" onclick="selectMusicTrack('builtin-1')">
+              <i class="fa-solid fa-play mr-2"></i> Bản Hòa Tấu Lãng Mạn - Wedding Day Dreams (Tích Hợp Sẵn)
+            </button>
+            <button class="btn-secondary" style="text-align: left;" onclick="selectMusicTrack('canon-in-d')">
+              <i class="fa-solid fa-play mr-2"></i> Canon in D - Pachelbel (Hòa tấu giao hưởng)
+            </button>
+            <button class="btn-secondary" style="text-align: left;" onclick="selectMusicTrack('wedding-piano')">
+              <i class="fa-solid fa-play mr-2"></i> Acoustic Wedding Love Story (Nhẹ nhàng, sâu lắng)
+            </button>
+            <button class="btn-secondary" style="text-align: left;" onclick="selectMusicTrack('romantic-memories')">
+              <i class="fa-solid fa-play mr-2"></i> Romantic Memories - Wedding Waltz (Du dương)
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Hoặc tải file nhạc MP3 từ thiết bị của bạn lên:</label>
+            <input type="file" class="form-input" accept="audio/mp3,audio/*" onchange="handleAudioUpload(event)">
+          </div>
+        </div>
+
+        <!-- PANE 6: MỪNG CƯỚI VIETQR -->
+        <div class="studio-pane" id="pane-banking">
+          <div class="studio-grid-2">
+            <!-- Chú Rể -->
+            <div>
+              <h4 style="color: var(--primary); margin-bottom: 12px;"><i class="fa-solid fa-qrcode mr-1"></i> Tài Khoản Chú Rể</h4>
+              <div class="form-group">
+                <label class="form-label">Tên Ngân Hàng:</label>
+                <input type="text" id="input-bank-groom-name" class="form-input" placeholder="Vietcombank">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mã Ngân Hàng (VCB, TCB, MB, ACB, CTG...):</label>
+                <input type="text" id="input-bank-groom-code" class="form-input" placeholder="VCB">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Số Tài Khoản:</label>
+                <input type="text" id="input-bank-groom-acc" class="form-input" placeholder="1029384756">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Họ và Tên Chủ Thẻ:</label>
+                <input type="text" id="input-bank-groom-owner" class="form-input" placeholder="NGUYEN VAN DUC">
+              </div>
+            </div>
+
+            <!-- Cô Dâu -->
+            <div>
+              <h4 style="color: var(--primary); margin-bottom: 12px;"><i class="fa-solid fa-qrcode mr-1"></i> Tài Khoản Cô Dâu</h4>
+              <div class="form-group">
+                <label class="form-label">Tên Ngân Hàng:</label>
+                <input type="text" id="input-bank-bride-name" class="form-input" placeholder="Techcombank">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mã Ngân Hàng (TCB, VCB, MB, ACB, BIDV...):</label>
+                <input type="text" id="input-bank-bride-code" class="form-input" placeholder="TCB">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Số Tài Khoản:</label>
+                <input type="text" id="input-bank-bride-acc" class="form-input" placeholder="1903847562019">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Họ và Tên Chủ Thẻ:</label>
+                <input type="text" id="input-bank-bride-owner" class="form-input" placeholder="TRAN THI THUY LINH">
+              </div>
+            </div>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">
+            <i class="fa-solid fa-circle-info"></i> Hệ thống tự động tạo mã QR VietQR theo tiêu chuẩn Ngân Hàng Nhà Nước, khách chỉ cần quét bằng bất kỳ ứng dụng ngân hàng nào là có thể chuyển khoản ngay mà không cần nhập lại STK.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Studio Footer Actions -->
+      <div class="studio-footer">
+        <button class="btn-secondary" onclick="resetToDefault()">
+          <i class="fa-solid fa-rotate-left mr-1"></i> Khôi Phục Mặc Định
+        </button>
+        <button class="btn-primary" onclick="saveStudioChanges()">
+          <i class="fa-solid fa-floppy-disk mr-1"></i> Lưu Cài Đặt & Cập Nhật Thiệp
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =======================================================
+       MODAL TẠO LINK KHÁCH MỜI CÁ NHÂN HÓA HÀNG LOẠT (QUICK GUEST MODAL)
+       ======================================================= -->
+  <div class="studio-modal-overlay" id="quick-guest-modal">
+    <div class="studio-dialog" style="max-width: 720px;">
+      
+      <!-- Modal Header -->
+      <div class="studio-header" style="background: linear-gradient(135deg, #1d4ed8, #2563eb);">
+        <h3><i class="fa-solid fa-users-gear"></i> Tạo & Quản Lý Link 10+ Khách Mời</h3>
+        <button class="studio-close-btn" onclick="closeQuickGuestModal()">&times;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="studio-content-body">
+        
+        <!-- Hướng dẫn & Điền mẫu -->
+        <div class="preset-samples-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <strong style="color: #1e3a8a;"><i class="fa-solid fa-lightbulb text-gold mr-1"></i> Tính năng cá nhân hóa thiệp mời:</strong>
+              <div style="font-size: 0.82rem; color: #4b5563; margin-top: 2px;">
+                Mỗi khách sẽ có 1 đường link riêng. Khi họ mở ra, tên họ sẽ xuất hiện trang trọng trên phong bì và thiệp cưới!
+              </div>
+            </div>
+            <button class="mini-btn btn-copy" onclick="fill10SampleGuests()" style="padding: 6px 12px; font-size: 0.8rem;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Điền Mẫu Nhanh 10 Khách
+            </button>
+          </div>
+        </div>
+
+        <!-- Khung nhập danh sách -->
+        <div class="guest-input-box" style="background: #ffffff; border: 1px solid #d1d5db;">
+          <label class="form-label" style="font-size: 0.88rem; color: #1f2937;">
+            <i class="fa-solid fa-pen-to-square text-primary mr-1"></i> Nhập danh sách khách mời (Mỗi người 1 dòng, ví dụ 10 người):
+          </label>
+          <textarea id="quick-guest-textarea" class="form-textarea" rows="4" placeholder="Anh Nguyễn Văn Tuấn & Bạn Gái&#10;Chị Trần Mai Phương&#10;Gia đình Bác Hùng&#10;Bạn Hoàng Long (FPT)&#10;Anh Minh & Chị Thảo..."></textarea>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 0.84rem; color: #4b5563;">Phía khách:</span>
+              <select id="quick-guest-side" class="form-select" style="width: 130px; padding: 6px 10px;">
+                <option value="Nhà Trai">Nhà Trai</option>
+                <option value="Nhà Gái">Nhà Gái</option>
+              </select>
+            </div>
+            <button class="btn-primary" onclick="handleGenerateBatchGuests()" style="background: #1d4ed8; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);">
+              <i class="fa-solid fa-bolt mr-1"></i> Tạo Ngay Danh Sách Link Khách Mời
+            </button>
+          </div>
+        </div>
+
+        <!-- Danh sách khách mời đã tạo -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 12px;">
+          <h4 style="color: #111827; font-size: 1.05rem;">
+            <i class="fa-solid fa-list-check text-primary mr-1"></i> Danh Sách Khách & Link Riêng Từng Người (<span id="quick-guest-count">0</span> khách):
+          </h4>
+          <button class="mini-btn btn-secondary" onclick="exportGuestsToTxt()" style="padding: 6px 12px;">
+            <i class="fa-solid fa-download mr-1"></i> Tải Về File Text
+          </button>
+        </div>
+
+        <div id="quick-guest-list-container">
+          <!-- Render danh sách khách mời và các nút 1-chạm gửi Zalo/Copy -->
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="studio-footer">
+        <span style="font-size: 0.82rem; color: #6b7280;">
+          💡 Bấm "Gửi Zalo" để gửi thiệp riêng cho khách chỉ với 1 chạm.
+        </span>
+        <button class="btn-secondary" onclick="closeQuickGuestModal()">
+          Đóng
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal Xác Thực Quản Trị Viên (Dành Cho Cô Dâu & Chú Rể) -->
+  <div class="pin-modal-overlay" id="pin-modal" style="display:none;">
+    <div class="pin-dialog">
+      <div class="pin-header">
+        <h4><i class="fa-solid fa-lock"></i> Đăng Nhập Quản Trị Viên</h4>
+        <button class="pin-close" onclick="closePinModal()">&times;</button>
+      </div>
+      <div class="pin-body">
+        <p style="font-size: 0.85rem; color: #4b5563; margin-bottom: 14px; line-height: 1.5;">
+          Khu vực dành riêng cho <strong>Cô Dâu & Chú Rể</strong> để đổi ảnh bìa, avatar, thêm/xóa ảnh album cưới và quản lý danh sách khách mời.
+        </p>
+        <div class="form-group">
+          <label style="font-size: 0.84rem; font-weight: 600; color: #1f2937;">Nhập mã PIN quản trị (Mặc định: 1234):</label>
+          <input type="password" id="admin-pin-input" class="form-input" placeholder="••••" style="text-align: center; letter-spacing: 6px; font-size: 1.3rem; margin-top: 6px;" maxlength="8" onkeydown="if(event.key==='Enter') verifyAdminPin()">
+        </div>
+        <div id="pin-error-msg" style="color: #dc2626; font-size: 0.82rem; display: none; margin-top: 6px; font-weight: 500;">
+          <i class="fa-solid fa-circle-exclamation mr-1"></i> Mã PIN không đúng! (Mặc định là 1234)
+        </div>
+      </div>
+      <div class="pin-footer">
+        <button class="btn-secondary" onclick="closePinModal()" style="padding: 8px 16px;">Hủy</button>
+        <button class="btn-primary" onclick="verifyAdminPin()" style="padding: 8px 20px;">
+          <i class="fa-solid fa-unlock-keyhole mr-1"></i> Mở Quản Trị
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Các thẻ input ẩn để tải ảnh trực tiếp từ thiết bị -->
+  <input type="file" id="input-file-cover" accept="image/*" style="display:none;" onchange="handleQuickPhotoUpload(event, 'cover')">
+  <input type="file" id="input-file-groom" accept="image/*" style="display:none;" onchange="handleQuickPhotoUpload(event, 'groom')">
+  <input type="file" id="input-file-bride" accept="image/*" style="display:none;" onchange="handleQuickPhotoUpload(event, 'bride')">
+  <input type="file" id="input-file-gallery" accept="image/*" multiple style="display:none;" onchange="handleGalleryUpload(event)">
+
+  <!-- Scripts -->
+  <script src="assets/js/audio-synth.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
