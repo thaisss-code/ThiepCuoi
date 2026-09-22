@@ -574,23 +574,44 @@
 
           <h4 style="color: var(--primary); margin-bottom: 12px;"><i class="fa-solid fa-music mr-1"></i> Chọn Bài Hát Nền</h4>
           <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+            <button class="btn-secondary" style="text-align: left; background: #ecfdf5; border-color: #6ee7b7; color: #065f46; font-weight: 600;" onclick="selectMusicTrack('local-wedding-song')">
+              <i class="fa-solid fa-folder-open mr-2 text-primary"></i> 🎵 Bài Hát Tự Đặt Trong Thư Mục (assets/audio/wedding-song.mp3)
+            </button>
             <button class="btn-secondary" style="text-align: left;" onclick="selectMusicTrack('builtin-1')">
-              <i class="fa-solid fa-play mr-2"></i> Bản Hòa Tấu Lãng Mạn - Wedding Day Dreams (Tích Hợp Sẵn)
+              <i class="fa-solid fa-play mr-2 text-gold"></i> Bản Hòa Tấu Lãng Mạn - Wedding Day Dreams (Tích Hợp Sẵn)
             </button>
             <button class="btn-secondary" style="text-align: left;" onclick="selectMusicTrack('canon-in-d')">
-              <i class="fa-solid fa-play mr-2"></i> Canon in D - Pachelbel (Hòa tấu giao hưởng)
+              <i class="fa-solid fa-play mr-2 text-gold"></i> Canon in D - Pachelbel (Hòa tấu giao hưởng)
             </button>
             <button class="btn-secondary" style="text-align: left;" onclick="selectMusicTrack('wedding-piano')">
-              <i class="fa-solid fa-play mr-2"></i> Acoustic Wedding Love Story (Nhẹ nhàng, sâu lắng)
+              <i class="fa-solid fa-play mr-2 text-gold"></i> Acoustic Wedding Love Story (Nhẹ nhàng, sâu lắng)
             </button>
             <button class="btn-secondary" style="text-align: left;" onclick="selectMusicTrack('romantic-memories')">
-              <i class="fa-solid fa-play mr-2"></i> Romantic Memories - Wedding Waltz (Du dương)
+              <i class="fa-solid fa-play mr-2 text-gold"></i> Romantic Memories - Wedding Waltz (Du dương)
             </button>
           </div>
 
+          <div class="form-group" style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-bottom: 14px;">
+            <label class="form-label" style="font-weight: 600; font-size: 0.84rem;">
+              <i class="fa-solid fa-link mr-1 text-primary"></i> Dán link bài hát MP3 online trực tiếp:
+            </label>
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <input type="url" id="input-online-music-url" class="form-input" placeholder="https://.../bai-hat-cuoi.mp3">
+              <button type="button" class="btn-primary" onclick="handleSetOnlineMusicUrl()" style="white-space: nowrap; padding: 6px 14px; font-size: 0.82rem;">
+                Lưu Link
+              </button>
+            </div>
+            <span style="font-size: 0.74rem; color: #64748b; margin-top: 4px; display: block;">
+              (Hỗ trợ link trực tiếp file .mp3 từ Google Drive, Dropbox, Catbox, Zing...)
+            </span>
+          </div>
+
           <div class="form-group">
-            <label class="form-label">Hoặc tải file nhạc MP3 từ thiết bị của bạn lên:</label>
+            <label class="form-label">Hoặc nghe thử file nhạc MP3 từ máy của bạn:</label>
             <input type="file" class="form-input" accept="audio/mp3,audio/*" onchange="handleAudioUpload(event)">
+            <p style="font-size: 0.76rem; color: #475569; margin-top: 6px; line-height: 1.4;">
+              💡 <em>Mẹo chạy 24/7 trên GitHub:</em> Trình duyệt có giới hạn bộ nhớ nên không lưu file nhạc nặng khi reload. Để bạn bè nghe được bài hát riêng của bạn 24/7, bạn chỉ cần copy file MP3 vào thư mục <strong>assets/audio/wedding-song.mp3</strong> trong máy tính rồi đưa lên GitHub nhé!
+            </p>
           </div>
         </div>
 
@@ -647,9 +668,12 @@
       </div>
 
       <!-- Studio Footer Actions -->
-      <div class="studio-footer">
+      <div class="studio-footer" style="flex-wrap: wrap; gap: 8px;">
         <button class="btn-secondary" onclick="resetToDefault()">
           <i class="fa-solid fa-rotate-left mr-1"></i> Khôi Phục Mặc Định
+        </button>
+        <button class="btn-secondary" onclick="exportDataJsFile()" style="background: #10b981; color: #fff; border-color: #059669; font-weight: 600;" title="Tải về file data.js đã cập nhật để copy vào assets/js/ rồi đẩy lên GitHub">
+          <i class="fa-solid fa-cloud-arrow-down mr-1"></i> Xuất File data.js Lên GitHub
         </button>
         <button class="btn-primary" onclick="saveStudioChanges()">
           <i class="fa-solid fa-floppy-disk mr-1"></i> Lưu Cài Đặt & Cập Nhật Thiệp
@@ -773,9 +797,9 @@
   <input type="file" id="input-file-bride" accept="image/*" style="display:none;" onchange="handleQuickPhotoUpload(event, 'bride')">
   <input type="file" id="input-file-gallery" accept="image/*" multiple style="display:none;" onchange="handleGalleryUpload(event)">
 
-  <!-- Scripts -->
-  <script src="assets/js/audio-synth.js"></script>
-  <script src="assets/js/data.js"></script>
-  <script src="assets/js/app.js"></script>
+  <!-- Scripts (Có gắn phiên bản cache busting để trình duyệt luôn tải file mới nhất) -->
+  <script src="assets/js/audio-synth.js?v=2.2"></script>
+  <script src="assets/js/data.js?v=2.2"></script>
+  <script src="assets/js/app.js?v=2.2"></script>
 </body>
 </html>
