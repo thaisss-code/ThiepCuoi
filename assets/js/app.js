@@ -942,6 +942,31 @@ window.triggerPhotoUpload = function(type) {
   }
 };
 
+function compressImageToDataUrl(file, maxWidth = 900, quality = 0.8) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 window.handleQuickPhotoUpload = function(event, type) {
   if (!window.checkIsAdmin()) {
     showToast('⚠️ Chỉ Cô Dâu & Chú Rể (Admin) mới có quyền đổi ảnh!');
@@ -950,9 +975,7 @@ window.handleQuickPhotoUpload = function(event, type) {
   const file = event.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const dataUrl = e.target.result;
+  compressImageToDataUrl(file, 900, 0.82).then((dataUrl) => {
     if (type === 'cover') {
       weddingDB.data.couple.coverImage = dataUrl;
       const heroBgEl = document.getElementById('hero-bg-image');
@@ -976,8 +999,7 @@ window.handleQuickPhotoUpload = function(event, type) {
       showToast('Đã đổi ảnh đại diện Cô Dâu! 👰');
     }
     weddingDB.saveData();
-  };
-  reader.readAsDataURL(file);
+  });
 };
 
 // Tải ảnh cưới lên Album
@@ -991,9 +1013,8 @@ window.handleGalleryUpload = function(event) {
 
   let loaded = 0;
   Array.from(files).forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      weddingDB.data.gallery.push(e.target.result);
+    compressImageToDataUrl(file, 900, 0.82).then((dataUrl) => {
+      weddingDB.data.gallery.push(dataUrl);
       loaded++;
       if (loaded === files.length) {
         weddingDB.saveData();
@@ -1001,8 +1022,7 @@ window.handleGalleryUpload = function(event) {
         renderStudioGallery();
         showToast(`Đã thêm ${loaded} ảnh mới vào Album Cưới! 🖼️`);
       }
-    };
-    reader.readAsDataURL(file);
+    });
   });
 };
 
